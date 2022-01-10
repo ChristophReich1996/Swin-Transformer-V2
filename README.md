@@ -66,7 +66,7 @@ the following parameters.
 | use_checkpoint | If true checkpointing is utilized | bool |
 | sequential_self_attention | If true sequential self-attention is performed | bool |
 
-[This file](examples.py) includes a full example how to use this implementation.
+[This file](example.py) includes a full example how to use this implementation.
 
 ## Disclaimer
 
