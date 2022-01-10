@@ -70,7 +70,7 @@ the following parameters.
 
 ## Disclaimer
 
-This is an very experimental implementation based on the [Swin Transformer V2 paper](https://arxiv.org/pdf/2111.09883.pdf) and the [official implementation of the Swin Transformer V1](https://github.com/microsoft/Swin-Transformer).
+This is a very experimental implementation based on the [Swin Transformer V2 paper](https://arxiv.org/pdf/2111.09883.pdf) and the [official implementation of the Swin Transformer V1](https://github.com/microsoft/Swin-Transformer).
 Since an official implementation of the Swin Transformer V2 is not yet published, it is not possible to say to which extent this implementation might differ from the original one. If you have any issues with this implementation please raise an issue.
 
 ## Reference
