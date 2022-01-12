@@ -14,7 +14,7 @@ Currently (10.01.2022), an official implementation of the Swin Transformer V2 is
 You can simply install the Swin Transformer V2 implementation as a Python package by using `pip`.
 
 ```shell script
-pip install git+https://github.com/ChristophReich1996/Involution
+pip install git+https://github.com/ChristophReich1996/Swin-Transformer-V2
 ```
 
 Alternatively, you can clone the repository and use the implementation in [swin_transformer_v2](swin_transformer_v2) directly in your project.
