@@ -90,7 +90,9 @@ def main(args) -> None:
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
                                   num_workers=min(20, args.batch_size), pin_memory=True)
     # Init model
-    model = ClassificationModelWrapper(model=swin_transformer_v2_t(input_resolution=(32, 32), window_size=8))
+    model = ClassificationModelWrapper(
+        model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
+                                    window_size=8))
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
     # Model to device
