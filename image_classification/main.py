@@ -15,7 +15,7 @@ parser.add_argument("--cuda_devices", default="0, 1", type=str,
                     help="String of cuda device indexes to be used. Indexes must be separated by a comma.")
 parser.add_argument("--data_parallel", default=False, action="store_true",
                     help="Binary flag. If set data parallel is utilized.")
-parser.add_argument("--epochs", default=800, type=int,
+parser.add_argument("--epochs", default=500, type=int,
                     help="Number of epochs to perform while training.")
 parser.add_argument("--lr", default=1e-03, type=float,
                     help="Learning rate to be employed.")
@@ -104,7 +104,8 @@ def main(args) -> None:
     # Init optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     # Init learning rate schedule
-    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[30], gamma=0.1, verbose=True)
+    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[50, 100, 150], gamma=0.1,
+                                                       verbose=True)
     # Init loss function
     loss_function = nn.CrossEntropyLoss()
     # Init model wrapper
