@@ -43,6 +43,8 @@ def main(args) -> None:
     # Init transformations
     transform_train = transforms.Compose([
         transforms.RandomCrop(size=32, padding=4),
+        transforms.RandomGrayscale(p=0.1),
+        transforms.RandomRotation(degrees=5),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
