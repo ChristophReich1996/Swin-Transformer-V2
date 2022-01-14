@@ -111,9 +111,7 @@ def swin_transformer_v2_t(input_resolution: Tuple[int, int],
                           in_channels: int = 3,
                           use_checkpoint: bool = False,
                           sequential_self_attention: bool = False,
-                          dropout: float = 0.0,
-                          dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2) -> SwinTransformerV2:
+                          **kwargs) -> SwinTransformerV2:
     """
     Function returns a tiny Swin Transformer V2 (SwinV2-T: C = 96, layer numbers = {2, 2, 6, 2}) for feature extraction
     :param input_resolution: (Tuple[int, int]) Input resolution
@@ -121,9 +119,6 @@ def swin_transformer_v2_t(input_resolution: Tuple[int, int],
     :param in_channels: (int) Number of input channels
     :param use_checkpoint: (bool) If true checkpointing is utilized
     :param sequential_self_attention: (bool) If true sequential self-attention is performed
-    :param dropout: (float) Dropout in input mapping
-    :param dropout_attention: (float) Dropout rate of attention map
-    :param dropout_path: (float) Dropout in main path
     :return: (SwinTransformerV2) Tiny Swin Transformer V2
     """
     return SwinTransformerV2(input_resolution=input_resolution,
@@ -134,9 +129,7 @@ def swin_transformer_v2_t(input_resolution: Tuple[int, int],
                              embedding_channels=96,
                              depths=(2, 2, 6, 2),
                              number_of_heads=(3, 6, 12, 24),
-                             dropout=dropout,
-                             dropout_attention=dropout_attention,
-                             dropout_path=dropout_path)
+                             **kwargs)
 
 
 def swin_transformer_v2_s(input_resolution: Tuple[int, int],
@@ -144,9 +137,7 @@ def swin_transformer_v2_s(input_resolution: Tuple[int, int],
                           in_channels: int = 3,
                           use_checkpoint: bool = False,
                           sequential_self_attention: bool = False,
-                          dropout: float = 0.0,
-                          dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2) -> SwinTransformerV2:
+                          **kwargs) -> SwinTransformerV2:
     """
     Function returns a small Swin Transformer V2 (SwinV2-S: C = 96, layer numbers ={2, 2, 18, 2}) for feature extraction
     :param input_resolution: (Tuple[int, int]) Input resolution
@@ -154,9 +145,6 @@ def swin_transformer_v2_s(input_resolution: Tuple[int, int],
     :param in_channels: (int) Number of input channels
     :param use_checkpoint: (bool) If true checkpointing is utilized
     :param sequential_self_attention: (bool) If true sequential self-attention is performed
-    :param dropout: (float) Dropout in input mapping
-    :param dropout_attention: (float) Dropout rate of attention map
-    :param dropout_path: (float) Dropout in main path
     :return: (SwinTransformerV2) Small Swin Transformer V2
     """
     return SwinTransformerV2(input_resolution=input_resolution,
@@ -167,9 +155,7 @@ def swin_transformer_v2_s(input_resolution: Tuple[int, int],
                              embedding_channels=96,
                              depths=(2, 2, 18, 2),
                              number_of_heads=(3, 6, 12, 24),
-                             dropout=dropout,
-                             dropout_attention=dropout_attention,
-                             dropout_path=dropout_path)
+                             **kwargs)
 
 
 def swin_transformer_v2_b(input_resolution: Tuple[int, int],
@@ -179,7 +165,8 @@ def swin_transformer_v2_b(input_resolution: Tuple[int, int],
                           sequential_self_attention: bool = False,
                           dropout: float = 0.0,
                           dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2) -> SwinTransformerV2:
+                          dropout_path: float = 0.2,
+                          **kwargs) -> SwinTransformerV2:
     """
     Function returns a base Swin Transformer V2 (SwinV2-B: C = 128, layer numbers ={2, 2, 18, 2}) for feature extraction
     :param input_resolution: (Tuple[int, int]) Input resolution
@@ -187,9 +174,6 @@ def swin_transformer_v2_b(input_resolution: Tuple[int, int],
     :param in_channels: (int) Number of input channels
     :param use_checkpoint: (bool) If true checkpointing is utilized
     :param sequential_self_attention: (bool) If true sequential self-attention is performed
-    :param dropout: (float) Dropout in input mapping
-    :param dropout_attention: (float) Dropout rate of attention map
-    :param dropout_path: (float) Dropout in main path
     :return: (SwinTransformerV2) Base Swin Transformer V2
     """
     return SwinTransformerV2(input_resolution=input_resolution,
@@ -200,9 +184,7 @@ def swin_transformer_v2_b(input_resolution: Tuple[int, int],
                              embedding_channels=128,
                              depths=(2, 2, 18, 2),
                              number_of_heads=(4, 8, 16, 32),
-                             dropout=dropout,
-                             dropout_attention=dropout_attention,
-                             dropout_path=dropout_path)
+                             **kwargs)
 
 
 def swin_transformer_v2_l(input_resolution: Tuple[int, int],
@@ -210,9 +192,7 @@ def swin_transformer_v2_l(input_resolution: Tuple[int, int],
                           in_channels: int = 3,
                           use_checkpoint: bool = False,
                           sequential_self_attention: bool = False,
-                          dropout: float = 0.0,
-                          dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2) -> SwinTransformerV2:
+                          **kwargs) -> SwinTransformerV2:
     """
     Function returns a large Swin Transformer V2 (SwinV2-L: C = 192, layer numbers ={2, 2, 18, 2}) for feature extraction
     :param input_resolution: (Tuple[int, int]) Input resolution
@@ -220,9 +200,6 @@ def swin_transformer_v2_l(input_resolution: Tuple[int, int],
     :param in_channels: (int) Number of input channels
     :param use_checkpoint: (bool) If true checkpointing is utilized
     :param sequential_self_attention: (bool) If true sequential self-attention is performed
-    :param dropout: (float) Dropout in input mapping
-    :param dropout_attention: (float) Dropout rate of attention map
-    :param dropout_path: (float) Dropout in main path
     :return: (SwinTransformerV2) Large Swin Transformer V2
     """
     return SwinTransformerV2(input_resolution=input_resolution,
@@ -233,9 +210,7 @@ def swin_transformer_v2_l(input_resolution: Tuple[int, int],
                              embedding_channels=192,
                              depths=(2, 2, 18, 2),
                              number_of_heads=(6, 12, 24, 48),
-                             dropout=dropout,
-                             dropout_attention=dropout_attention,
-                             dropout_path=dropout_path)
+                             **kwargs)
 
 
 def swin_transformer_v2_h(input_resolution: Tuple[int, int],
@@ -243,9 +218,7 @@ def swin_transformer_v2_h(input_resolution: Tuple[int, int],
                           in_channels: int = 3,
                           use_checkpoint: bool = False,
                           sequential_self_attention: bool = False,
-                          dropout: float = 0.0,
-                          dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2) -> SwinTransformerV2:
+                          **kwargs) -> SwinTransformerV2:
     """
     Function returns a large Swin Transformer V2 (SwinV2-H: C = 352, layer numbers = {2, 2, 18, 2}) for feature extraction
     :param input_resolution: (Tuple[int, int]) Input resolution
@@ -253,9 +226,6 @@ def swin_transformer_v2_h(input_resolution: Tuple[int, int],
     :param in_channels: (int) Number of input channels
     :param use_checkpoint: (bool) If true checkpointing is utilized
     :param sequential_self_attention: (bool) If true sequential self-attention is performed
-    :param dropout: (float) Dropout in input mapping
-    :param dropout_attention: (float) Dropout rate of attention map
-    :param dropout_path: (float) Dropout in main path
     :return: (SwinTransformerV2) Large Swin Transformer V2
     """
     return SwinTransformerV2(input_resolution=input_resolution,
@@ -266,9 +236,7 @@ def swin_transformer_v2_h(input_resolution: Tuple[int, int],
                              embedding_channels=352,
                              depths=(2, 2, 18, 2),
                              number_of_heads=(11, 22, 44, 88),
-                             dropout=dropout,
-                             dropout_attention=dropout_attention,
-                             dropout_path=dropout_path)
+                             **kwargs)
 
 
 def swin_transformer_v2_g(input_resolution: Tuple[int, int],
@@ -276,9 +244,7 @@ def swin_transformer_v2_g(input_resolution: Tuple[int, int],
                           in_channels: int = 3,
                           use_checkpoint: bool = False,
                           sequential_self_attention: bool = False,
-                          dropout: float = 0.0,
-                          dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2) -> SwinTransformerV2:
+                          **kwargs) -> SwinTransformerV2:
     """
     Function returns a giant Swin Transformer V2 (SwinV2-G: C = 512, layer numbers = {2, 2, 42, 2}) for feature extraction
     :param input_resolution: (Tuple[int, int]) Input resolution
@@ -286,9 +252,6 @@ def swin_transformer_v2_g(input_resolution: Tuple[int, int],
     :param in_channels: (int) Number of input channels
     :param use_checkpoint: (bool) If true checkpointing is utilized
     :param sequential_self_attention: (bool) If true sequential self-attention is performed
-    :param dropout: (float) Dropout in input mapping
-    :param dropout_attention: (float) Dropout rate of attention map
-    :param dropout_path: (float) Dropout in main path
     :return: (SwinTransformerV2) Giant Swin Transformer V2
     """
     return SwinTransformerV2(input_resolution=input_resolution,
@@ -299,6 +262,4 @@ def swin_transformer_v2_g(input_resolution: Tuple[int, int],
                              embedding_channels=512,
                              depths=(2, 2, 42, 2),
                              number_of_heads=(16, 32, 64, 128),
-                             dropout=dropout,
-                             dropout_attention=dropout_attention,
-                             dropout_path=dropout_path)
+                             **kwargs)
