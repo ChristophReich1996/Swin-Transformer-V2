@@ -104,7 +104,7 @@ def main(args) -> None:
     # Init optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     # Init learning rate schedule
-    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[30], gamma=0.01, verbose=True)
+    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[30], gamma=0.1, verbose=True)
     # Init loss function
     loss_function = nn.CrossEntropyLoss()
     # Init model wrapper
