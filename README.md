@@ -68,7 +68,7 @@ the following parameters.
 
 [This file](example.py) includes a full example how to use this implementation.
 
-This repository also provides an [image classification training script](image_classification/main.py).
+This repository also provides an [image classification training script](image_classification/main.py) for [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) and [Places365](https://www.cs.toronto.edu/~kriz/cifar.html).
 
 ## Disclaimer
 
