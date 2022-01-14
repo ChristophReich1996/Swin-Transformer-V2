@@ -46,6 +46,7 @@ from utils import ClassificationModelWrapper
 
 def main(args) -> None:
     if args.dataset == "cifar10":
+        print("CIFAR10 dataset utilized")
         # Init transformations
         transform_train = transforms.Compose([
             transforms.RandomCrop(size=32, padding=4),
@@ -68,6 +69,7 @@ def main(args) -> None:
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
                                   num_workers=min(20, args.batch_size), pin_memory=True)
     else:
+        print("Places365 dataset utilized")
         # Init transformations
         transform_train = transforms.Compose([
             transforms.RandomGrayscale(p=0.1),
