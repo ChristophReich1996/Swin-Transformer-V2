@@ -24,7 +24,7 @@ class SwinTransformerV2(nn.Module):
                  ff_feature_ratio: int = 4,
                  dropout: float = 0.0,
                  dropout_attention: float = 0.0,
-                 dropout_path: float = 0.1,
+                 dropout_path: float = 0.2,
                  use_checkpoint: bool = False,
                  sequential_self_attention: bool = False) -> None:
         """
