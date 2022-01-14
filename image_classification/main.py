@@ -25,6 +25,11 @@ parser.add_argument("--batch_size", default=256, type=int,
                     help="Number of epochs to perform while training.")
 parser.add_argument("--load_network", default=None, type=str,
                     help="If set given network (state dict) is loaded.")
+parser.add_argument("--dataset", default="cifar10", type=str, choices=["cifar10, places365"],
+                    help="Dataset to be used (CIFAR10 or Places365). "
+                         "Places365 dataset (easy directory structure) must be downloaded in advance.")
+parser.add_argument("--dataset_path", default="", type=str,
+                    help="Dataset path, only needed for Places365 dataset.")
 
 # Get arguments
 args = parser.parse_args()
@@ -40,28 +45,50 @@ from utils import ClassificationModelWrapper
 
 
 def main(args) -> None:
-    # Init transformations
-    transform_train = transforms.Compose([
-        transforms.RandomCrop(size=32, padding=4),
-        transforms.RandomGrayscale(p=0.1),
-        transforms.RandomRotation(degrees=5),
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
-    ])
-    transform_test = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
-    ])
-    # Init datasets
-    training_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=True, download=True,
-                                                    transform=transform_train)
-    training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
+    if args.dataset == "cifar10":
+        # Init transformations
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(size=32, padding=4),
+            transforms.RandomGrayscale(p=0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
+        ])
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
+        ])
+        # Init datasets
+        training_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=True, download=True,
+                                                        transform=transform_train)
+        training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
+                                      num_workers=min(20, args.batch_size), pin_memory=True)
+        test_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=False, download=True,
+                                                    transform=transform_test)
+        test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
                                   num_workers=min(20, args.batch_size), pin_memory=True)
-    test_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=False, download=True,
-                                                transform=transform_test)
-    test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                              num_workers=min(20, args.batch_size), pin_memory=True)
+    else:
+        # Init transformations
+        transform_train = transforms.Compose([
+            transforms.RandomGrayscale(p=0.1),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomResizedCrop(size=256),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+        ])
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+        ])
+        # Init datasets
+        training_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "train"),
+                                                            transform=transform_train)
+        training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
+                                      num_workers=min(20, args.batch_size), pin_memory=True)
+        test_dataset = torchvision.datasets.CIFAR10(root=os.path.join(args.dataset_path, "val"),
+                                                    transform=transform_test)
+        test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
+                                  num_workers=min(20, args.batch_size), pin_memory=True)
     # Init model
     model = ClassificationModelWrapper(model=swin_transformer_v2_t(input_resolution=(32, 32), window_size=8))
     # Print number of parameters

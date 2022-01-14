@@ -24,7 +24,7 @@ Alternatively, you can clone the repository and use the implementation in [swin_
 This implementation provides the configurations reported in the paper (SwinV2-T, SwinV2-S, etc.). You can build the
 model by calling the corresponding function. Please note that the Swin Transformer V2 (`SwinTransformerV2` class) 
 implementation returns the feature maps of each stage of the network (`List[torch.Tensor]`). If you want to use this 
-implementation for image classification simply wrap this model and take the final feature map (a wrapper example can be found [here](cifar_10/utils.py).
+implementation for image classification simply wrap this model and take the final feature map (a wrapper example can be found [here](image_classification/utils.py).
 
 ```python
 from swin_transformer_v2 import SwinTransformerV2
@@ -68,7 +68,7 @@ the following parameters.
 
 [This file](example.py) includes a full example how to use this implementation.
 
-This repository also provides a [CIFAR10 training script](cifar_10/main.py).
+This repository also provides an [image classification training script](image_classification/main.py).
 
 ## Disclaimer
 
