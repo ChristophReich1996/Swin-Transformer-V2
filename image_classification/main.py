@@ -15,11 +15,11 @@ parser.add_argument("--cuda_devices", default="0, 1", type=str,
                     help="String of cuda device indexes to be used. Indexes must be separated by a comma.")
 parser.add_argument("--data_parallel", default=False, action="store_true",
                     help="Binary flag. If set data parallel is utilized.")
-parser.add_argument("--epochs", default=250, type=int,
+parser.add_argument("--epochs", default=800, type=int,
                     help="Number of epochs to perform while training.")
 parser.add_argument("--lr", default=1e-03, type=float,
                     help="Learning rate to be employed.")
-parser.add_argument("--weight_decay", default=1e-08, type=float,
+parser.add_argument("--weight_decay", default=1e-04, type=float,
                     help="Weight decay to be employed.")
 parser.add_argument("--batch_size", default=256, type=int,
                     help="Number of epochs to perform while training.")
@@ -50,7 +50,6 @@ def main(args) -> None:
         # Init transformations
         transform_train = transforms.Compose([
             transforms.RandomCrop(size=32, padding=4),
-            transforms.RandomGrayscale(p=0.1),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.ToTensor(),
             transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
