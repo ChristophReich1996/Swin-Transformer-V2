@@ -19,7 +19,7 @@ parser.add_argument("--epochs", default=500, type=int,
                     help="Number of epochs to perform while training.")
 parser.add_argument("--lr", default=1e-03, type=float,
                     help="Learning rate to be employed.")
-parser.add_argument("--weight_decay", default=1e-04, type=float,
+parser.add_argument("--weight_decay", default=1e-02, type=float,
                     help="Weight decay to be employed.")
 parser.add_argument("--batch_size", default=256, type=int,
                     help="Number of epochs to perform while training.")
@@ -51,6 +51,8 @@ def main(args) -> None:
         transform_train = transforms.Compose([
             transforms.RandomCrop(size=32, padding=4),
             transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomGrayscale(p=0.1),
+            transforms.RandomRotation(degrees=2),
             transforms.ToTensor(),
             transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
         ])
