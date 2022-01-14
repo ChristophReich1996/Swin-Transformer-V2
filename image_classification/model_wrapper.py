@@ -93,9 +93,14 @@ class ModelWrapper(object):
             self.lr_schedule.step()
         # Close progress bar
         self.progress_bar.close()
+        # Final testing
+        print("Training")
+        self.test(train=True)
+        print("Test")
+        self.test()
 
     @torch.no_grad()
-    def test(self, epoch: int) -> None:
+    def test(self, epoch: int = -1, train: bool = False) -> None:
         """
         Test function
         :param epoch: (int) Current epoch
@@ -108,7 +113,7 @@ class ModelWrapper(object):
         # Model into eval mode
         self.model.eval()
         # Training loop
-        for index, (inputs, labels) in enumerate(self.test_dataset):
+        for index, (inputs, labels) in enumerate(self.test_dataset if not train else self.training_dataset):
             # Data to device
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
@@ -124,21 +129,22 @@ class ModelWrapper(object):
             # Save metric and loss
             metrics.append(metric.item())
             losses.append(loss.item())
-        # Log loss and metric
-        self.logger.log_metric(metric_name="test_loss", value=np.mean(losses))
-        self.logger.log_metric(metric_name="test_metric", value=np.mean(metrics))
         # Save model
-        if np.mean(metrics) > self.best_metric:
-            # Set new best accuracy
-            self.best_metric = np.mean(metrics)
-            # Print info
-            print("Save best model with accuracy", self.best_metric)
-            # Save model
-            self.logger.save_model(
-                model_sate_dict={
-                    "model": self.model.module.model.state_dict()
-                    if isinstance(self.model, nn.DataParallel) else self.model.state_dict(),
-                    "acc": self.best_metric,
-                    "epoch": epoch + 1,
-                    "optimizer": self.optimizer.state_dict()},
-                name="best_model")
+        if not train:
+            # Log loss and metric
+            self.logger.log_metric(metric_name="test_loss", value=np.mean(losses))
+            self.logger.log_metric(metric_name="test_metric", value=np.mean(metrics))
+            if np.mean(metrics) > self.best_metric:
+                # Set new best accuracy
+                self.best_metric = np.mean(metrics)
+                # Print info
+                print("Save best model with accuracy", self.best_metric)
+                # Save model
+                self.logger.save_model(
+                    model_sate_dict={
+                        "model": self.model.module.model.state_dict()
+                        if isinstance(self.model, nn.DataParallel) else self.model.state_dict(),
+                        "acc": self.best_metric,
+                        "epoch": epoch + 1,
+                        "optimizer": self.optimizer.state_dict()},
+                    name="best_model")
