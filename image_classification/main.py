@@ -25,7 +25,7 @@ parser.add_argument("--batch_size", default=256, type=int,
                     help="Number of epochs to perform while training.")
 parser.add_argument("--load_network", default=None, type=str,
                     help="If set given network (state dict) is loaded.")
-parser.add_argument("--dataset", default="cifar10", type=str, choices=["cifar10, places365"],
+parser.add_argument("--dataset", default="cifar10", type=str, choices=["cifar10", "places365"],
                     help="Dataset to be used (CIFAR10 or Places365). "
                          "Places365 dataset (easy directory structure) must be downloaded in advance.")
 parser.add_argument("--dataset_path", default="", type=str,
@@ -88,8 +88,8 @@ def main(args) -> None:
                                                             transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
                                       num_workers=min(20, args.batch_size), pin_memory=True)
-        test_dataset = torchvision.datasets.CIFAR10(root=os.path.join(args.dataset_path, "val"),
-                                                    transform=transform_test)
+        test_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "val"),
+                                                        transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
                                   num_workers=min(20, args.batch_size), pin_memory=True)
     # Init model
@@ -108,7 +108,9 @@ def main(args) -> None:
     # Init optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     # Init learning rate schedule
-    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=[50, 100, 150], gamma=0.1,
+    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer,
+                                                       milestones=[50, 100, 150] if args.dataset == "cifar10" else
+                                                       [10, 50, 75], gamma=0.1,
                                                        verbose=True)
     # Init loss function
     loss_function = nn.CrossEntropyLoss()
