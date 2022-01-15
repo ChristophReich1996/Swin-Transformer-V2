@@ -95,7 +95,8 @@ def main(args) -> None:
     # Init model
     model = ClassificationModelWrapper(
         model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
-                                    window_size=8, dropout=0.1, dropout_path=0.2))
+                                    window_size=8, dropout=0.1, dropout_path=0.2),
+        number_of_classes=10 if args.dataset == "cifar10" else 365)
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
     # Model to device
