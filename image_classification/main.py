@@ -19,7 +19,7 @@ parser.add_argument("--epochs", default=500, type=int,
                     help="Number of epochs to perform while training.")
 parser.add_argument("--lr", default=1e-03, type=float,
                     help="Learning rate to be employed.")
-parser.add_argument("--weight_decay", default=1e-02, type=float,
+parser.add_argument("--weight_decay", default=5e-02, type=float,
                     help="Weight decay to be employed.")
 parser.add_argument("--batch_size", default=256, type=int,
                     help="Number of epochs to perform while training.")
@@ -64,11 +64,11 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=True, download=True,
                                                         transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(20, args.batch_size), pin_memory=True)
+                                      num_workers=min(30, args.batch_size), pin_memory=True)
         test_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=False, download=True,
                                                     transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(20, args.batch_size), pin_memory=True)
+                                  num_workers=min(30, args.batch_size), pin_memory=True)
     else:
         print("Places365 dataset utilized")
         # Init transformations
@@ -87,16 +87,16 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "train"),
                                                             transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(20, args.batch_size), pin_memory=True)
+                                      num_workers=min(30, args.batch_size), pin_memory=True)
         test_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "val"),
                                                         transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(20, args.batch_size), pin_memory=True)
+                                  num_workers=min(30, args.batch_size), pin_memory=True)
     # Init model
     model = ClassificationModelWrapper(
         model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
                                     window_size=8, dropout=0.1 if args.dataset == "cifar10" else 0.0,
-                                    dropout_path=0.3 if args.dataset == "cifar10" else 0.2),
+                                    dropout_path=0.3 if args.dataset == "cifar10" else 0.1),
         number_of_classes=10 if args.dataset == "cifar10" else 365)
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
@@ -106,12 +106,9 @@ def main(args) -> None:
     if args.data_parallel:
         model = nn.DataParallel(model)
     # Init optimizer
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.95))
     # Init learning rate schedule
-    lr_schedule = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer,
-                                                       milestones=[50, 100, 150] if args.dataset == "cifar10" else
-                                                       [10, 50, 75], gamma=0.1,
-                                                       verbose=True)
+    lr_schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     # Init loss function
     loss_function = nn.CrossEntropyLoss()
     # Init model wrapper
