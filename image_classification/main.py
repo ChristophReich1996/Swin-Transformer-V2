@@ -53,10 +53,7 @@ def main(args) -> None:
         print("CIFAR10 dataset utilized")
         # Init transformations
         transform_train = transforms.Compose([
-            transforms.RandomCrop(size=32, padding=4),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomGrayscale(p=0.1),
-            transforms.RandomRotation(degrees=2),
+            rand_augment_transform(config_str="rand-m9-n3-mstd0.5", hparams={"img_mean": (125, 123, 114)}),
             transforms.ToTensor(),
             transforms.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010))
         ])
@@ -77,7 +74,7 @@ def main(args) -> None:
         print("Places365 dataset utilized")
         # Init transformations
         transform_train = transforms.Compose([
-            rand_augment_transform(config_str="rand-m9-n3-mstd0.5", hparams={}),
+            rand_augment_transform(config_str="rand-m9-n3-mstd0.5", hparams={"img_mean": (124, 116, 104)}),
             transforms.ToTensor(),
             transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
         ])
@@ -129,7 +126,8 @@ def main(args) -> None:
                                                     num_classes=10 if args.dataset == "cifar10" else 365,
                                                     label_smoothing=0.1),
                                  validation_metric=Accuracy(),
-                                 logger=Logger(experiment_path_extension=str(model.__class__.__name__)),
+                                 logger=Logger(experiment_path_extension=str(model.__class__.__name__)
+                                                                         + "_{}".format(args.dataset)),
                                  device=args.device)
     # Perform training
     model_wrapper.train(epochs=args.epochs)
