@@ -98,12 +98,12 @@ class ModelWrapper(object):
         self.progress_bar.close()
         # Final testing
         print("Training")
-        self.test(train=True)
+        self.test(train=True, print_results=True)
         print("Test")
-        self.test()
+        self.test(print_results=True)
 
     @torch.no_grad()
-    def test(self, epoch: int = -1, train: bool = False) -> None:
+    def test(self, epoch: int = -1, train: bool = False, print_results: bool = False) -> None:
         """
         Test function
         :param epoch: (int) Current epoch
@@ -132,6 +132,10 @@ class ModelWrapper(object):
             # Save metric and loss
             metrics.append(metric.item())
             losses.append(loss.item())
+        # Print results if utilized
+        if print_results:
+            print("Accuracy:", np.mean(metrics))
+            print("Loss:", np.mean(losses))
         # Save model
         if not train:
             # Log loss and metric
@@ -145,9 +149,14 @@ class ModelWrapper(object):
                 # Save model
                 self.logger.save_model(
                     model_sate_dict={
-                        "model": self.model.module.model.state_dict()
+                        "model": self.model.module.state_dict()
                         if isinstance(self.model, nn.DataParallel) else self.model.state_dict(),
                         "acc": self.best_metric,
                         "epoch": epoch + 1,
                         "optimizer": self.optimizer.state_dict()},
                     name="best_model")
+                # Save only the backbone
+                self.logger.save_model(
+                    model_sate_dict=self.model.module.model.state_dict()
+                    if isinstance(self.model, nn.DataParallel) else self.model.model.state_dict(),
+                    name="best_model_backbone")
