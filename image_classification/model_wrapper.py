@@ -19,6 +19,7 @@ class ModelWrapper(object):
                  model: Union[nn.Module, nn.DataParallel],
                  optimizer: torch.optim.Optimizer,
                  loss_function: nn.Module,
+                 loss_function_test: nn.Module,
                  training_dataset: DataLoader,
                  test_dataset: DataLoader,
                  lr_schedule: Any,
@@ -40,6 +41,7 @@ class ModelWrapper(object):
         self.model = model
         self.optimizer = optimizer
         self.loss_function = loss_function
+        self.loss_function_test = loss_function_test
         self.training_dataset = training_dataset
         self.test_dataset = test_dataset
         self.lr_schedule = lr_schedule
@@ -121,7 +123,7 @@ class ModelWrapper(object):
             # Make prediction
             predictions = self.model(inputs)
             # Compute loss
-            loss = self.loss_function(predictions, labels)
+            loss = self.loss_function_test(predictions, labels)
             # Get metric
             metric = self.validation_metric(predictions, labels)
             # Print progress bar

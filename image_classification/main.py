@@ -121,6 +121,7 @@ def main(args) -> None:
     model_wrapper = ModelWrapper(model=model,
                                  optimizer=optimizer,
                                  loss_function=loss_function,
+                                 loss_function_test=nn.CrossEntropyLoss(),
                                  training_dataset=training_dataset,
                                  test_dataset=test_dataset,
                                  lr_schedule=lr_schedule,
