@@ -22,6 +22,7 @@ class ModelWrapper(object):
                  training_dataset: DataLoader,
                  test_dataset: DataLoader,
                  lr_schedule: Any,
+                 augmentation: Any,
                  validation_metric: nn.Module,
                  logger: Logger,
                  device: str = "cuda") -> None:
@@ -42,6 +43,7 @@ class ModelWrapper(object):
         self.training_dataset = training_dataset
         self.test_dataset = test_dataset
         self.lr_schedule = lr_schedule
+        self.augmentation = augmentation
         self.validation_metric = validation_metric
         self.logger = logger
         self.device = device
@@ -67,6 +69,8 @@ class ModelWrapper(object):
                 # Data to device
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
+                # Perform augmentation
+                inputs, labels = self.augmentation(inputs, labels)
                 # Reset gradients
                 self.optimizer.zero_grad()
                 # Make prediction
@@ -77,20 +81,17 @@ class ModelWrapper(object):
                 loss.backward()
                 # Perform optimization
                 self.optimizer.step()
-                # Get metric
-                metric = self.validation_metric(predictions, labels)
                 # Print info in progress bar
                 self.progress_bar.set_description(
-                    "Epoch: {} | Loss: {:.4f} | Acc: {:.4f}".format(epoch + 1, loss.item(), metric.item()))
+                    "Epoch: {} | Loss: {:.4f}".format(epoch + 1, loss.item()))
                 # Log loss and metric
                 self.logger.log_metric(metric_name="training_loss", value=loss.item())
-                self.logger.log_metric(metric_name="training_metric", value=metric.item())
+                # Learning rate schedule step
+                self.lr_schedule.step_update(epoch * len(self.training_dataset) + index)
             # Perform testing
             self.test(epoch=epoch)
             # Save metrics
             self.logger.save()
-            # Learning rate schedule step
-            self.lr_schedule.step()
         # Close progress bar
         self.progress_bar.close()
         # Final testing

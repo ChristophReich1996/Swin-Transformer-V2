@@ -1,10 +1,14 @@
+import os
+from argparse import ArgumentParser
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torchvision
 import torchvision.transforms as transforms
-import os
-from argparse import ArgumentParser
+from timm.data import rand_augment_transform, Mixup
+from timm.loss import SoftTargetCrossEntropy
+from timm.scheduler import CosineLRScheduler
 
 # Manage command line arguments
 parser = ArgumentParser()
@@ -73,9 +77,7 @@ def main(args) -> None:
         print("Places365 dataset utilized")
         # Init transformations
         transform_train = transforms.Compose([
-            transforms.RandomGrayscale(p=0.1),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomResizedCrop(size=256),
+            rand_augment_transform(config_str="rand-m9-n3-mstd0.5", hparams={}),
             transforms.ToTensor(),
             transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
         ])
@@ -87,11 +89,11 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "train"),
                                                             transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(30, args.batch_size), pin_memory=True)
+                                      num_workers=min(32, args.batch_size), pin_memory=True)
         test_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "val"),
                                                         transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(30, args.batch_size), pin_memory=True)
+                                  num_workers=min(32, args.batch_size), pin_memory=True)
     # Init model
     model = ClassificationModelWrapper(
         model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
@@ -108,9 +110,13 @@ def main(args) -> None:
     # Init optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.95))
     # Init learning rate schedule
-    lr_schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+    lr_schedule = CosineLRScheduler(optimizer=optimizer,
+                                    t_initial=args.epochs * len(training_dataset),
+                                    t_mul=1., lr_min=5e-6, warmup_lr_init=5e-7,
+                                    warmup_t=10 * len(training_dataset), cycle_limit=1,
+                                    t_in_epochs=False)
     # Init loss function
-    loss_function = nn.CrossEntropyLoss()
+    loss_function = SoftTargetCrossEntropy()
     # Init model wrapper
     model_wrapper = ModelWrapper(model=model,
                                  optimizer=optimizer,
@@ -118,6 +124,9 @@ def main(args) -> None:
                                  training_dataset=training_dataset,
                                  test_dataset=test_dataset,
                                  lr_schedule=lr_schedule,
+                                 augmentation=Mixup(mixup_alpha=0.8, cutmix_alpha=0.8,
+                                                    num_classes=10 if args.dataset == "cifar10" else 365,
+                                                    label_smoothing=0.1),
                                  validation_metric=Accuracy(),
                                  logger=Logger(experiment_path_extension=str(model.__class__.__name__)),
                                  device=args.device)
