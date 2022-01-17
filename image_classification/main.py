@@ -65,11 +65,11 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=True, download=True,
                                                         transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(30, args.batch_size), pin_memory=True)
+                                      num_workers=min(32, args.batch_size), pin_memory=True, prefetch_factor=3)
         test_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=False, download=True,
                                                     transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(30, args.batch_size), pin_memory=True)
+                                  num_workers=min(32, args.batch_size), pin_memory=True)
     else:
         print("Places365 dataset utilized")
         # Init transformations
@@ -86,7 +86,7 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "train"),
                                                             transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(32, args.batch_size), pin_memory=True)
+                                      num_workers=min(32, args.batch_size), pin_memory=True, prefetch_factor=3)
         test_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "val"),
                                                         transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
@@ -94,8 +94,7 @@ def main(args) -> None:
     # Init model
     model = ClassificationModelWrapper(
         model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
-                                    window_size=8, dropout=0.1 if args.dataset == "cifar10" else 0.0,
-                                    dropout_path=0.3 if args.dataset == "cifar10" else 0.1),
+                                    window_size=8, dropout_path=0.15 if args.dataset == "cifar10" else 0.1),
         number_of_classes=10 if args.dataset == "cifar10" else 365)
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
@@ -122,7 +121,8 @@ def main(args) -> None:
                                  training_dataset=training_dataset,
                                  test_dataset=test_dataset,
                                  lr_schedule=lr_schedule,
-                                 augmentation=Mixup(mixup_alpha=0.8, cutmix_alpha=0.8,
+                                 augmentation=Mixup(mixup_alpha=1.0,
+                                                    cutmix_alpha=1.0,
                                                     num_classes=10 if args.dataset == "cifar10" else 365,
                                                     label_smoothing=0.1),
                                  validation_metric=Accuracy(),
