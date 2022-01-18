@@ -78,7 +78,7 @@ This repository also provides an [image classification training script](image_cl
 | Model | Dataset | Accuracy | Weights |
 | ------------- | ------------- | ------------- | ------------- |
 | Swin Transformer V2 T | CIFAR10 | 0.8989 |  |
-| Swin Transformer V2 T deformable | CIFAR10 |  |  |
+| Swin Transformer V2 T deformable | CIFAR10 | 0.8970 |  |
 | Swin Transformer V2 T | Places365 (256 X 256) |  |  |
 | Swin Transformer V2 T deformable | Places365 (256 X 256) |  |  |
 
