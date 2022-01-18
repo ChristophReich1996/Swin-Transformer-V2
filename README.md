@@ -73,6 +73,15 @@ This implementation also includes a deformable version of the Swin Transformer V
 
 This repository also provides an [image classification training script](image_classification/main.py) for [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) and [Places365](https://www.cs.toronto.edu/~kriz/cifar.html).
 
+## Results
+
+| Model | Dataset | Accuracy | Weights |
+| ------------- | ------------- | ------------- | ------------- |
+| Swin Transformer V2 T | CIFAR10 | 0.8989 |  |
+| Swin Transformer V2 T deformable | CIFAR10 |  |  |
+| Swin Transformer V2 T | Places365 (256 X 256) |  |  |
+| Swin Transformer V2 T deformable | Places365 (256 X 256) |  |  |
+
 ## Disclaimer
 
 This is a very experimental implementation based on the [Swin Transformer V2 paper](https://arxiv.org/pdf/2111.09883.pdf) and the [official implementation of the Swin Transformer V1](https://github.com/microsoft/Swin-Transformer).
