@@ -74,7 +74,7 @@ class SwinTransformerV2(nn.Module):
                     dropout_path=dropout_path[sum(depths[:index]):sum(depths[:index + 1])],
                     use_checkpoint=use_checkpoint,
                     sequential_self_attention=sequential_self_attention,
-                    use_deformable_block=use_deformable_block
+                    use_deformable_block=use_deformable_block and (index > 0)
                 ))
 
     def update_resolution(self, new_window_size: int, new_input_resolution: Tuple[int, int]) -> None:
