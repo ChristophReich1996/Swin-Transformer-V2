@@ -99,7 +99,7 @@ class ModelWrapper(object):
         # Final testing
         print("Training")
         self.test(train=True, print_results=True)
-        print("Test")
+        print("Validation")
         self.test(print_results=True)
 
     @torch.no_grad()
