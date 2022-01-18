@@ -36,6 +36,8 @@ parser.add_argument("--dataset_path", default="", type=str,
                     help="Dataset path, only needed for Places365 dataset.")
 parser.add_argument("--deformable", default=False, action="store_true",
                     help="Binary flag. If set deformable Swin Transformer V2 block is utilized.")
+parser.add_argument("--model_type", default="t", type=str, choices=["t", "s", "b", "l", "h", "g"],
+                    help="Swin Transformer V2 network type. ")
 
 # Get arguments
 args = parser.parse_args()
@@ -43,7 +45,7 @@ args = parser.parse_args()
 # Set cuda visible devices
 os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda_devices
 
-from swin_transformer_v2 import swin_transformer_v2_t
+from swin_transformer_v2 import *
 from metrics import Accuracy
 from model_wrapper import ModelWrapper
 from logger import Logger
@@ -94,9 +96,21 @@ def main(args) -> None:
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
                                   num_workers=min(32, args.batch_size), pin_memory=True)
     # Init model
+    if args.model_type == "t":
+        model_function = swin_transformer_v2_t
+    elif args.model_type == "s":
+        model_function = swin_transformer_v2_s
+    elif args.model_type == "b":
+        model_function = swin_transformer_v2_b
+    elif args.model_type == "l":
+        model_function = swin_transformer_v2_l
+    elif args.model_type == "h":
+        model_function = swin_transformer_v2_h
+    else:
+        model_function = swin_transformer_v2_g
     model = ClassificationModelWrapper(
-        model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
-                                    window_size=8, dropout_path=0.1, use_deformable_block=args.deformable),
+        model=model_function(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
+                             window_size=8, dropout_path=0.1, use_deformable_block=args.deformable),
         number_of_classes=10 if args.dataset == "cifar10" else 365)
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
