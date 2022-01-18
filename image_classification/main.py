@@ -98,20 +98,27 @@ def main(args) -> None:
     # Init model
     if args.model_type == "t":
         model_function = swin_transformer_v2_t
+        output_channels = 768
     elif args.model_type == "s":
         model_function = swin_transformer_v2_s
+        output_channels = 768
     elif args.model_type == "b":
         model_function = swin_transformer_v2_b
+        output_channels = 1024
     elif args.model_type == "l":
         model_function = swin_transformer_v2_l
+        output_channels = 1536
     elif args.model_type == "h":
         model_function = swin_transformer_v2_h
+        output_channels = 2816
     else:
         model_function = swin_transformer_v2_g
+        output_channels = 4096
     model = ClassificationModelWrapper(
         model=model_function(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
                              window_size=8, dropout_path=0.1, use_deformable_block=args.deformable),
-        number_of_classes=10 if args.dataset == "cifar10" else 365)
+        number_of_classes=10 if args.dataset == "cifar10" else 365,
+        output_channels=output_channels)
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
     # Model to device
