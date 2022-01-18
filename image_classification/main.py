@@ -34,6 +34,8 @@ parser.add_argument("--dataset", default="cifar10", type=str, choices=["cifar10"
                          "Places365 dataset (easy directory structure) must be downloaded in advance.")
 parser.add_argument("--dataset_path", default="", type=str,
                     help="Dataset path, only needed for Places365 dataset.")
+parser.add_argument("--deformable", default=False, action="store_true",
+                    help="Binary flag. If set deformable Swin Transformer V2 block is utilized.")
 
 # Get arguments
 args = parser.parse_args()
@@ -94,7 +96,7 @@ def main(args) -> None:
     # Init model
     model = ClassificationModelWrapper(
         model=swin_transformer_v2_t(input_resolution=(32, 32) if args.dataset == "cifar10" else (256, 256),
-                                    window_size=8, dropout_path=0.1),
+                                    window_size=8, dropout_path=0.1, use_deformable_block=args.deformable),
         number_of_classes=10 if args.dataset == "cifar10" else 365)
     # Print number of parameters
     print("# parameters", sum([p.numel() for p in model.parameters()]))
