@@ -6,7 +6,7 @@ from swin_transformer_v2 import swin_transformer_v2_t, SwinTransformerV2
 
 
 def main() -> None:
-    # Make input tensor and init Swin Transformer V2
+    # Make input tensor and init Swin Transformer V2, for the custom deformable version set use_deformable_block=True
     input = torch.rand(2, 3, 256, 256)
     swin_transformer: SwinTransformerV2 = swin_transformer_v2_t(in_channels=3,
                                                                 window_size=8,

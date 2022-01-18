@@ -2,10 +2,11 @@ from typing import Tuple, Optional, List, Union, Any
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 import timm
 
-__all__: List[str] = ["SwinTransformerStage", "SwinTransformerBlock"]
+__all__: List[str] = ["SwinTransformerStage", "SwinTransformerBlock", "DeformableSwinTransformerBlock"]
 
 
 class FeedForward(nn.Sequential):
@@ -158,7 +159,9 @@ class WindowMultiHeadAttention(nn.Module):
                                                  * torch.log(1. + relative_coordinates.abs())
         self.register_buffer("relative_coordinates_log", relative_coordinates_log)
 
-    def update_resolution(self, new_window_size: int, **kwargs: Any) -> None:
+    def update_resolution(self,
+                          new_window_size: int,
+                          **kwargs: Any) -> None:
         """
         Method updates the window size and so the pair-wise relative positions
         :param new_window_size: (int) New window size
@@ -400,7 +403,9 @@ class SwinTransformerBlock(nn.Module):
         # Save mask
         self.register_buffer("attention_mask", attention_mask)
 
-    def update_resolution(self, new_window_size: int, new_input_resolution: Tuple[int, int]) -> None:
+    def update_resolution(self,
+                          new_window_size: int,
+                          new_input_resolution: Tuple[int, int]) -> None:
         """
         Method updates the window size and so the pair-wise relative positions
         :param new_window_size: (int) New window size
@@ -462,6 +467,121 @@ class SwinTransformerBlock(nn.Module):
         output_normalize: torch.Tensor = bhwc_to_bchw(self.normalization_2(bchw_to_bhwc(output_feed_forward)))
         output: torch.Tensor = output_skip + self.dropout(output_normalize)
         return output
+
+
+class DeformableSwinTransformerBlock(SwinTransformerBlock):
+    """
+    This class implements a deformable version of the Swin Transformer block.
+    Inspired by: https://arxiv.org/pdf/2201.00520.pdf
+    """
+
+    def __init__(self,
+                 in_channels: int,
+                 input_resolution: Tuple[int, int],
+                 number_of_heads: int,
+                 window_size: int = 7,
+                 shift_size: int = 0,
+                 ff_feature_ratio: int = 4,
+                 dropout: float = 0.0,
+                 dropout_attention: float = 0.0,
+                 dropout_path: float = 0.0,
+                 sequential_self_attention: bool = False,
+                 offset_downscale_factor: int = 2) -> None:
+        """
+        Constructor method
+        :param in_channels: (int) Number of input channels
+        :param input_resolution: (Tuple[int, int]) Input resolution
+        :param number_of_heads: (int) Number of attention heads to be utilized
+        :param window_size: (int) Window size to be utilized
+        :param shift_size: (int) Shifting size to be used
+        :param ff_feature_ratio: (int) Ratio of the hidden dimension in the FFN to the input channels
+        :param dropout: (float) Dropout in input mapping
+        :param dropout_attention: (float) Dropout rate of attention map
+        :param dropout_path: (float) Dropout in main path
+        :param sequential_self_attention: (bool) If true sequential self-attention is performed
+        :param offset_downscale_factor: (int) Downscale factor of offset network
+        """
+        # Call super constructor
+        super(DeformableSwinTransformerBlock, self).__init__(
+            in_channels=in_channels,
+            input_resolution=input_resolution,
+            number_of_heads=number_of_heads,
+            window_size=window_size,
+            shift_size=shift_size,
+            ff_feature_ratio=ff_feature_ratio,
+            dropout=dropout,
+            dropout_attention=dropout_attention,
+            dropout_path=dropout_path,
+            sequential_self_attention=sequential_self_attention
+        )
+        # Save parameter
+        self.offset_downscale_factor: int = offset_downscale_factor
+        self.number_of_heads: int = number_of_heads
+        # Make default offsets
+        self.__make_default_offsets()
+        # Init offset network
+        self.offset_network: nn.Module = nn.Sequential(
+            nn.Conv2d(in_channels=in_channels, out_channels=in_channels, kernel_size=5, stride=offset_downscale_factor,
+                      padding=3, groups=in_channels, bias=True),
+            nn.GELU(),
+            nn.Conv2d(in_channels=in_channels, out_channels=2 * self.number_of_heads, kernel_size=1, stride=1,
+                      padding=0, bias=True)
+        )
+
+    def __make_default_offsets(self) -> None:
+        """
+        Method generates the default sampling grid (inspired by kornia)
+        """
+        # Init x and y coordinates
+        x: torch.Tensor = torch.linspace(0, self.input_resolution[1] - 1, self.input_resolution[1])
+        y: torch.Tensor = torch.linspace(0, self.input_resolution[0] - 1, self.input_resolution[0])
+        # Normalize coordinates to a range of [-1, 1]
+        x: torch.Tensor = (x / (self.input_resolution[1] - 1) - 0.5) * 2
+        y: torch.Tensor = (y / (self.input_resolution[0] - 1) - 0.5) * 2
+        # Make grid [2, height, width]
+        grid: torch.Tensor = torch.stack(torch.meshgrid([x, y])).transpose(1, 2)
+        # Reshape grid to [1, height, width, 2]
+        grid: torch.Tensor = grid.unsqueeze(dim=0).permute(0, 2, 3, 1)
+        # Register in module
+        self.register_buffer("default_grid", grid)
+
+    def update_resolution(self, new_window_size: int, new_input_resolution: Tuple[int, int]) -> None:
+        """
+        Method updates the window size and so the pair-wise relative positions
+        :param new_window_size: (int) New window size
+        :param new_input_resolution: (Tuple[int, int]) New input resolution
+        """
+        # Update resolution and window size
+        super(DeformableSwinTransformerBlock, self).update_resolution(new_window_size=new_window_size,
+                                                                      new_input_resolution=new_input_resolution)
+        # Update default sampling grid
+        self.__make_default_offsets()
+
+    def forward(self,
+                input: torch.Tensor) -> torch.Tensor:
+        # Get input shape
+        batch_size, channels, height, width = input.shape
+        # Compute offsets of the shape [batch size, 2, height / r, width / r]
+        offsets: torch.Tensor = self.offset_network(input)
+        # Upscale offsets to the shape [batch size, 2 * number of heads, height, width]
+        offsets: torch.Tensor = self.offset_downscale_factor * \
+                                F.interpolate(input=offsets,
+                                              size=(height, width), mode="bilinear", align_corners=True).tanh()
+        # Reshape offsets to [batch size, number of heads, height, width, 2]
+        offsets: torch.Tensor = offsets.reshape(batch_size, -1, 2, height, width).permute(0, 1, 3, 4, 2)
+        # Flatten batch size and number of heads
+        offsets: torch.Tensor = offsets.view(-1, height, width, 2)
+        # Construct offset grid
+        offset_grid: torch.Tensor = self.default_grid.repeat_interleave(repeats=offsets.shape[0], dim=0) + offsets
+        # Reshape input to [batch size * number of heads, channels / number of heads, height, width]
+        input: torch.Tensor = input.view(batch_size, self.number_of_heads, channels // self.number_of_heads, height,
+                                         width).flatten(start_dim=0, end_dim=1)
+        # Apply sampling grid
+        input_resampled: torch.Tensor = F.grid_sample(input=input, grid=offset_grid, mode="bilinear",
+                                                      align_corners=True)
+        # Reshape resampled tensor again to [batch size, channels, height, width]
+        input_resampled: torch.Tensor = input_resampled.view(batch_size, channels, height, width)
+        return super(DeformableSwinTransformerBlock, self).forward(input=input_resampled)
 
 
 class PatchMerging(nn.Module):
@@ -561,7 +681,8 @@ class SwinTransformerStage(nn.Module):
                  dropout_attention: float = 0.0,
                  dropout_path: Union[List[float], float] = 0.0,
                  use_checkpoint: bool = False,
-                 sequential_self_attention: bool = False) -> None:
+                 sequential_self_attention: bool = False,
+                 use_deformable_block: bool = False) -> None:
         """
         Constructor method
         :param in_channels: (int) Number of input channels
@@ -577,6 +698,7 @@ class SwinTransformerStage(nn.Module):
         :param dropout_path: (float) Dropout in main path
         :param use_checkpoint: (bool) If true checkpointing is utilized
         :param sequential_self_attention: (bool) If true sequential self-attention is performed
+        :param use_deformable_block: (bool) If true deformable block is used
         """
         # Call super constructor
         super(SwinTransformerStage, self).__init__()
@@ -589,18 +711,20 @@ class SwinTransformerStage(nn.Module):
         self.input_resolution: Tuple[int, int] = (input_resolution[0] // 2, input_resolution[1] // 2) \
             if downscale else input_resolution
         in_channels = in_channels * 2 if downscale else in_channels
+        # Get block
+        block = DeformableSwinTransformerBlock if use_deformable_block else SwinTransformerBlock
         # Init blocks
         self.blocks: nn.ModuleList = nn.ModuleList([
-            SwinTransformerBlock(in_channels=in_channels,
-                                 input_resolution=self.input_resolution,
-                                 number_of_heads=number_of_heads,
-                                 window_size=window_size,
-                                 shift_size=0 if ((index % 2) == 0) else window_size // 2,
-                                 ff_feature_ratio=ff_feature_ratio,
-                                 dropout=dropout,
-                                 dropout_attention=dropout_attention,
-                                 dropout_path=dropout_path[index] if isinstance(dropout_path, list) else dropout_path,
-                                 sequential_self_attention=sequential_self_attention)
+            block(in_channels=in_channels,
+                  input_resolution=self.input_resolution,
+                  number_of_heads=number_of_heads,
+                  window_size=window_size,
+                  shift_size=0 if ((index % 2) == 0) else window_size // 2,
+                  ff_feature_ratio=ff_feature_ratio,
+                  dropout=dropout,
+                  dropout_attention=dropout_attention,
+                  dropout_path=dropout_path[index] if isinstance(dropout_path, list) else dropout_path,
+                  sequential_self_attention=sequential_self_attention)
             for index in range(depth)])
 
     def update_resolution(self, new_window_size: int, new_input_resolution: Tuple[int, int]) -> None:

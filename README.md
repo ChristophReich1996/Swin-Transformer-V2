@@ -65,8 +65,11 @@ the following parameters.
 | dropout_path | Dropout in main path | float |
 | use_checkpoint | If true checkpointing is utilized | bool |
 | sequential_self_attention | If true sequential self-attention is performed | bool |
+| use_deformable_block | If true deformable block is used | bool |
 
 [This file](example.py) includes a full example how to use this implementation.
+
+This implementation also includes a deformable version of the Swin Transformer V2 inspired by the paper [Vision Transformer with Deformable Attention](https://arxiv.org/pdf/2201.00520.pdf). Deformable attention can be utilized by setting `use_deformable_block=True`.
 
 This repository also provides an [image classification training script](image_classification/main.py) for [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) and [Places365](https://www.cs.toronto.edu/~kriz/cifar.html).
 

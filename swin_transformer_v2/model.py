@@ -26,7 +26,8 @@ class SwinTransformerV2(nn.Module):
                  dropout_attention: float = 0.0,
                  dropout_path: float = 0.2,
                  use_checkpoint: bool = False,
-                 sequential_self_attention: bool = False) -> None:
+                 sequential_self_attention: bool = False,
+                 use_deformable_block: bool = False) -> None:
         """
         Constructor method
         :param in_channels: (int) Number of input channels
@@ -42,6 +43,7 @@ class SwinTransformerV2(nn.Module):
         :param dropout_path: (float) Dropout in main path
         :param use_checkpoint: (bool) If true checkpointing is utilized
         :param sequential_self_attention: (bool) If true sequential self-attention is performed
+        :param use_deformable_block: (bool) If true deformable block is used
         """
         # Call super constructor
         super(SwinTransformerV2, self).__init__()
@@ -71,7 +73,8 @@ class SwinTransformerV2(nn.Module):
                     dropout_attention=dropout_attention,
                     dropout_path=dropout_path[sum(depths[:index]):sum(depths[:index + 1])],
                     use_checkpoint=use_checkpoint,
-                    sequential_self_attention=sequential_self_attention
+                    sequential_self_attention=sequential_self_attention,
+                    use_deformable_block=use_deformable_block
                 ))
 
     def update_resolution(self, new_window_size: int, new_input_resolution: Tuple[int, int]) -> None:
