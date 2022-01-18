@@ -577,7 +577,7 @@ class DeformableSwinTransformerBlock(SwinTransformerBlock):
         input: torch.Tensor = input.view(batch_size, self.number_of_heads, channels // self.number_of_heads, height,
                                          width).flatten(start_dim=0, end_dim=1)
         # Apply sampling grid
-        input_resampled: torch.Tensor = F.grid_sample(input=input, grid=offset_grid.tanh(),
+        input_resampled: torch.Tensor = F.grid_sample(input=input, grid=offset_grid.clip(min=-1, max=1),
                                                       mode="bilinear", align_corners=True, padding_mode="reflection")
         # Reshape resampled tensor again to [batch size, channels, height, width]
         input_resampled: torch.Tensor = input_resampled.view(batch_size, channels, height, width)
