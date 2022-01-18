@@ -132,7 +132,7 @@ def main(args) -> None:
     lr_schedule = CosineLRScheduler(optimizer=optimizer,
                                     t_initial=args.epochs * len(training_dataset),
                                     t_mul=1., lr_min=5e-6, warmup_lr_init=5e-7,
-                                    warmup_t=(10 if args.dataset == "cifar10" else 4) * len(training_dataset),
+                                    warmup_t=(10 if args.dataset == "cifar10" else 2) * len(training_dataset),
                                     cycle_limit=1,
                                     t_in_epochs=False)
     # Init loss function
