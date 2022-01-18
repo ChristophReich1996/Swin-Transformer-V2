@@ -564,8 +564,7 @@ class DeformableSwinTransformerBlock(SwinTransformerBlock):
         # Compute offsets of the shape [batch size, 2, height / r, width / r]
         offsets: torch.Tensor = self.offset_network(input)
         # Upscale offsets to the shape [batch size, 2 * number of heads, height, width]
-        offsets: torch.Tensor = self.offset_downscale_factor * \
-                                F.interpolate(input=offsets,
+        offsets: torch.Tensor = F.interpolate(input=offsets,
                                               size=(height, width), mode="bilinear", align_corners=True)
         # Reshape offsets to [batch size, number of heads, height, width, 2]
         offsets: torch.Tensor = offsets.reshape(batch_size, -1, 2, height, width).permute(0, 1, 3, 4, 2)
