@@ -4,7 +4,7 @@ Unofficial **PyTorch** reimplementation of the
 paper [Swin Transformer V2: Scaling Up Capacity and Resolution](https://arxiv.org/pdf/2111.09883.pdf)
 by Ze Liu, Han Hu et al. (Microsoft Research Asia).
 
-**This repository includes a pure PyTorch implementation of the Swin Transformer V2.**
+**This repository includes a pure PyTorch implementation of the Swin Transformer V2 and provides pre-trained weights (CIFAR10 & Places365).**
 
 The official Swin Transformer V1 implementation is available [here](https://github.com/microsoft/Swin-Transformer).
 Currently (10.01.2022), an official implementation of the Swin Transformer V2 is not publicly available.
@@ -77,10 +77,9 @@ This repository also provides an [image classification training script](image_cl
 
 | Model | Dataset | Accuracy | Weights |
 | ------------- | ------------- | ------------- | ------------- |
-| Swin Transformer V2 T | CIFAR10 | 0.8989 |  |
-| Swin Transformer V2 T deformable | CIFAR10 | 0.8970 |  |
+| Swin Transformer V2 T | CIFAR10 | 0.8989 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EUcOsKRdnpVHhmWS2ZgMS3MB3oMVZZxAb9Mhh8bm7Fa2pg?e=E2o4l3) |
+| Swin Transformer V2 T deformable | CIFAR10 | 0.8970 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EWq07HJ2l25MnoyBB474Ws4BPGaxJk4SUtBr-T7MIaX3ng?e=iG1tGD) |
 | Swin Transformer V2 T | Places365 (256 X 256) |  |  |
-| Swin Transformer V2 T deformable | Places365 (256 X 256) |  |  |
 
 ## Disclaimer
 
