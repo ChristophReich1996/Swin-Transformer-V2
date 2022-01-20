@@ -90,11 +90,11 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "train"),
                                                             transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(40, args.batch_size), pin_memory=True, prefetch_factor=10)
+                                      num_workers=min(20, args.batch_size), pin_memory=True, prefetch_factor=10)
         test_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "val"),
                                                         transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(40, args.batch_size), pin_memory=True, prefetch_factor=10)
+                                  num_workers=min(20, args.batch_size), pin_memory=True, prefetch_factor=10)
     # Init model
     if args.model_type == "t":
         model_function = swin_transformer_v2_t
