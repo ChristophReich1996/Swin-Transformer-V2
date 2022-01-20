@@ -204,7 +204,7 @@ class WindowMultiHeadAttention(nn.Module):
         # Compute attention map with scaled cosine attention
         attention_map: torch.Tensor = torch.einsum("bhqd, bhkd -> bhqk", query, key) \
                                       / torch.maximum(torch.norm(query, dim=-1, keepdim=True)
-                                                      * torch.norm(key, dim=-1, keepdim=True),
+                                                      * torch.norm(key, dim=-1, keepdim=True).transpose(-2, -1),
                                                       torch.tensor(1e-06, device=query.device, dtype=query.dtype))
         attention_map: torch.Tensor = attention_map / self.tau.clamp(min=0.01)
         # Apply relative positional encodings
