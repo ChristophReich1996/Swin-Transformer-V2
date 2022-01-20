@@ -77,8 +77,8 @@ This repository also provides an [image classification training script](image_cl
 
 | Model | Dataset | Accuracy | Weights |
 | ------------- | ------------- | ------------- | ------------- |
-| Swin Transformer V2 T | CIFAR10 | 0.8989 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EUcOsKRdnpVHhmWS2ZgMS3MB3oMVZZxAb9Mhh8bm7Fa2pg?e=E2o4l3) |
-| Swin Transformer V2 T deformable | CIFAR10 | 0.8970 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EWq07HJ2l25MnoyBB474Ws4BPGaxJk4SUtBr-T7MIaX3ng?e=iG1tGD) |
+| Swin Transformer V2 T | CIFAR10 | 0.8974 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EUcOsKRdnpVHhmWS2ZgMS3MB3oMVZZxAb9Mhh8bm7Fa2pg?e=E2o4l3) |
+| Swin Transformer V2 T deformable | CIFAR10 | 0.8962 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EWq07HJ2l25MnoyBB474Ws4BPGaxJk4SUtBr-T7MIaX3ng?e=iG1tGD) |
 | Swin Transformer V2 T | Places365 (256 X 256) |  |  |
 
 ## Disclaimer
