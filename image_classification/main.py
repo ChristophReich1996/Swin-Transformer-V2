@@ -150,8 +150,8 @@ def main(args) -> None:
                                                     num_classes=10 if args.dataset == "cifar10" else 365,
                                                     label_smoothing=0.1),
                                  validation_metric=Accuracy(),
-                                 logger=Logger(experiment_path_extension=str(model.__class__.__name__)
-                                                                         + "_{}".format(args.dataset)),
+                                 logger=Logger(experiment_path_extension="_Swin_{}_{}".format(args.model_type,
+                                                                                              args.dataset)),
                                  device=args.device)
     # Perform training
     model_wrapper.train(epochs=args.epochs)
