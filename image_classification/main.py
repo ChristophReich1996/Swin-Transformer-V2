@@ -69,11 +69,11 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=True, download=True,
                                                         transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(32, args.batch_size), pin_memory=True, prefetch_factor=3)
+                                      num_workers=min(40, args.batch_size), pin_memory=True, prefetch_factor=10)
         test_dataset = torchvision.datasets.CIFAR10(root="./CIFAR10", train=False, download=True,
                                                     transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(32, args.batch_size), pin_memory=True)
+                                  num_workers=min(40, args.batch_size), pin_memory=True, prefetch_factor=10)
     else:
         print("Places365 dataset utilized")
         # Init transformations
@@ -90,11 +90,11 @@ def main(args) -> None:
         training_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "train"),
                                                             transform=transform_train)
         training_dataset = DataLoader(training_dataset, batch_size=args.batch_size, shuffle=True,
-                                      num_workers=min(32, args.batch_size), pin_memory=True, prefetch_factor=3)
+                                      num_workers=min(40, args.batch_size), pin_memory=True, prefetch_factor=10)
         test_dataset = torchvision.datasets.ImageFolder(root=os.path.join(args.dataset_path, "val"),
                                                         transform=transform_test)
         test_dataset = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False,
-                                  num_workers=min(32, args.batch_size), pin_memory=True)
+                                  num_workers=min(40, args.batch_size), pin_memory=True, prefetch_factor=10)
     # Init model
     if args.model_type == "t":
         model_function = swin_transformer_v2_t
@@ -150,8 +150,10 @@ def main(args) -> None:
                                                     num_classes=10 if args.dataset == "cifar10" else 365,
                                                     label_smoothing=0.1),
                                  validation_metric=Accuracy(),
-                                 logger=Logger(experiment_path_extension="_Swin_{}_{}".format(args.model_type,
-                                                                                              args.dataset)),
+                                 logger=Logger(experiment_path_extension="_Swin_{}{}_{}".format(
+                                     args.model_type,
+                                     "_deformable" if args.deformable else "",
+                                     args.dataset)),
                                  device=args.device)
     # Perform training
     model_wrapper.train(epochs=args.epochs)
