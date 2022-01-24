@@ -286,7 +286,7 @@ class WindowMultiHeadAttention(nn.Module):
         batch_size_windows, channels, height, width = input.shape  # type: int, int, int, int
         tokens: int = height * width
         # Reshape input to [batch size * windows, tokens (height * width), channels]
-        input: torch.Tensor = input.view(batch_size_windows, channels, tokens).permute(0, 2, 1)
+        input: torch.Tensor = input.reshape(batch_size_windows, channels, tokens).permute(0, 2, 1)
         # Perform query, key, and value mapping
         query_key_value: torch.Tensor = self.mapping_qkv(input)
         query_key_value: torch.Tensor = query_key_value.view(batch_size_windows, tokens, 3, self.number_of_heads,
