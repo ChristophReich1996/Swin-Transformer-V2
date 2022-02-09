@@ -534,9 +534,9 @@ class DeformableSwinTransformerBlock(SwinTransformerBlock):
         """
         # Init x and y coordinates
         x: torch.Tensor = torch.linspace(0, self.input_resolution[1] - 1, self.input_resolution[1],
-                                         device=self.tau.device)
+                                         device=self.window_attention.tau.device)
         y: torch.Tensor = torch.linspace(0, self.input_resolution[0] - 1, self.input_resolution[0],
-                                         device=self.tau.device)
+                                         device=self.window_attention.tau.device)
         # Normalize coordinates to a range of [-1, 1]
         x: torch.Tensor = (x / (self.input_resolution[1] - 1) - 0.5) * 2
         y: torch.Tensor = (y / (self.input_resolution[0] - 1) - 0.5) * 2
