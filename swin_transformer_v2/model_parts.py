@@ -570,6 +570,9 @@ class DeformableSwinTransformerBlock(SwinTransformerBlock):
         offsets: torch.Tensor = offsets.reshape(batch_size, -1, 2, height, width).permute(0, 1, 3, 4, 2)
         # Flatten batch size and number of heads and apply tanh
         offsets: torch.Tensor = offsets.view(-1, height, width, 2).tanh()
+        # Cast offset grid to input data type
+        if input.dtype != self.default_grid.dtype:
+            self.default_grid = self.default_grid.type(input.dtype)
         # Construct offset grid
         offset_grid: torch.Tensor = self.default_grid.repeat_interleave(repeats=offsets.shape[0], dim=0) + offsets
         # Reshape input to [batch size * number of heads, channels / number of heads, height, width]
