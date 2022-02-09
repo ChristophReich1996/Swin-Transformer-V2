@@ -141,16 +141,16 @@ class WindowMultiHeadAttention(nn.Module):
             nn.Linear(in_features=2, out_features=meta_network_hidden_features, bias=True),
             nn.ReLU(inplace=True),
             nn.Linear(in_features=meta_network_hidden_features, out_features=number_of_heads, bias=True))
-        # Init pair-wise relative positions (log-spaced)
-        self.__make_pair_wise_relative_positions()
         # Init tau
         self.register_parameter("tau", torch.nn.Parameter(torch.ones(1, number_of_heads, 1, 1)))
+        # Init pair-wise relative positions (log-spaced)
+        self.__make_pair_wise_relative_positions()
 
     def __make_pair_wise_relative_positions(self) -> None:
         """
         Method initializes the pair-wise relative positions to compute the positional biases
         """
-        indexes: torch.Tensor = torch.arange(self.window_size)
+        indexes: torch.Tensor = torch.arange(self.window_size, device=self.tau.device)
         coordinates: torch.Tensor = torch.stack(torch.meshgrid([indexes, indexes]), dim=0)
         coordinates: torch.Tensor = torch.flatten(coordinates, start_dim=1)
         relative_coordinates: torch.Tensor = coordinates[:, :, None] - coordinates[:, None, :]
@@ -381,7 +381,7 @@ class SwinTransformerBlock(nn.Module):
         # Make masks for shift case
         if self.shift_size > 0:
             height, width = self.input_resolution  # type: int, int
-            mask: torch.Tensor = torch.zeros(height, width)
+            mask: torch.Tensor = torch.zeros(height, width, device=self.window_attention.tau.device)
             height_slices: Tuple = (slice(0, -self.window_size),
                                     slice(-self.window_size, -self.shift_size),
                                     slice(-self.shift_size, None))
@@ -533,8 +533,10 @@ class DeformableSwinTransformerBlock(SwinTransformerBlock):
         Method generates the default sampling grid (inspired by kornia)
         """
         # Init x and y coordinates
-        x: torch.Tensor = torch.linspace(0, self.input_resolution[1] - 1, self.input_resolution[1])
-        y: torch.Tensor = torch.linspace(0, self.input_resolution[0] - 1, self.input_resolution[0])
+        x: torch.Tensor = torch.linspace(0, self.input_resolution[1] - 1, self.input_resolution[1],
+                                         device=self.tau.device)
+        y: torch.Tensor = torch.linspace(0, self.input_resolution[0] - 1, self.input_resolution[0],
+                                         device=self.tau.device)
         # Normalize coordinates to a range of [-1, 1]
         x: torch.Tensor = (x / (self.input_resolution[1] - 1) - 0.5) * 2
         y: torch.Tensor = (y / (self.input_resolution[0] - 1) - 0.5) * 2
