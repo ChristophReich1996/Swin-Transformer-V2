@@ -166,9 +166,6 @@ def swin_transformer_v2_b(input_resolution: Tuple[int, int],
                           in_channels: int = 3,
                           use_checkpoint: bool = False,
                           sequential_self_attention: bool = False,
-                          dropout: float = 0.0,
-                          dropout_attention: float = 0.0,
-                          dropout_path: float = 0.2,
                           **kwargs) -> SwinTransformerV2:
     """
     Function returns a base Swin Transformer V2 (SwinV2-B: C = 128, layer numbers ={2, 2, 18, 2}) for feature extraction
