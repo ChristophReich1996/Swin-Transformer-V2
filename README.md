@@ -40,7 +40,7 @@ swin_transformer: SwinTransformerV2 = swin_transformer_v2_t(in_channels=3,
                                                             use_checkpoint=False)
 ```
 
-If you want to change the resolution and/or the window size for fine-tuning or inference pleas use the `update_resolution` method.
+If you want to change the resolution and/or the window size for fine-tuning or inference please use the `update_resolution` method.
 
 ```python
 # Change resolution and window size of the model
