@@ -1,5 +1,7 @@
 # Swin Transformer V2: Scaling Up Capacity and Resolution
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ChristophReich1996/Swin-Transformer-V2/blob/master/LICENSE)
+
 Unofficial **PyTorch** reimplementation of the
 paper [Swin Transformer V2: Scaling Up Capacity and Resolution](https://arxiv.org/pdf/2111.09883.pdf)
 by Ze Liu, Han Hu et al. (Microsoft Research Asia).
