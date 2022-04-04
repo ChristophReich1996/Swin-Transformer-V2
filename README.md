@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ChristophReich1996/Swin-Transformer-V2/blob/master/LICENSE)
 
+**This implementation has been merged into the [PyTorch Image Models](https://github.com/rwightman/pytorch-image-models) library (Timm) with the nice help of [Ross Wightman](https://github.com/rwightman). Timm also offers pre-trained weights on ImageNet1k ([see release](https://github.com/rwightman/pytorch-image-models/releases/tag/v0.1-weights-swinv2)).**
+
 Unofficial **PyTorch** reimplementation of the
 paper [Swin Transformer V2: Scaling Up Capacity and Resolution](https://arxiv.org/pdf/2111.09883.pdf)
 by Ze Liu, Han Hu et al. (Microsoft Research Asia).
