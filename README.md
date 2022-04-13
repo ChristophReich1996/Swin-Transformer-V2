@@ -11,7 +11,7 @@ by Ze Liu, Han Hu et al. (Microsoft Research Asia).
 **This repository includes a pure PyTorch implementation of the Swin Transformer V2 and provides pre-trained weights (CIFAR10 & Places365).**
 
 The official Swin Transformer V1 implementation is available [here](https://github.com/microsoft/Swin-Transformer).
-Currently (25.01.2022), an official implementation of the Swin Transformer V2 is not publicly available.
+Currently (13.04.2022), an official implementation of the Swin Transformer V2 is not publicly available.
 
 ## Installation
 
