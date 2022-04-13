@@ -85,6 +85,8 @@ This repository also provides an [image classification training script](image_cl
 | Swin Transformer V2 T deformable | CIFAR10 | 0.8962 | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/EWq07HJ2l25MnoyBB474Ws4BPGaxJk4SUtBr-T7MIaX3ng?e=iG1tGD) |
 | Swin Transformer V2 B | Places365 (256 X 256) | 0.4456 (after 13 epochs) | [backbone weights](https://studtudarmstadtde-my.sharepoint.com/:u:/g/personal/christoph_reich_stud_tu-darmstadt_de/ER6-OUZmpzNKnTjbYmeVXYMBV-7Vdnr9HFVr6nsaMaKK7w?e=DvAYAU) |
 
+For details on how to load the checkpoints have a look at [this issue](https://github.com/ChristophReich1996/Swin-Transformer-V2/issues/9).
+
 ## Disclaimer
 
 This is a very experimental implementation based on the [Swin Transformer V2 paper](https://arxiv.org/pdf/2111.09883.pdf) and the [official implementation of the Swin Transformer V1](https://github.com/microsoft/Swin-Transformer).
