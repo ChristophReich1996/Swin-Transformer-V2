@@ -13,6 +13,8 @@ by Ze Liu, Han Hu et al. (Microsoft Research Asia).
 The official Swin Transformer V1 implementation is available [here](https://github.com/microsoft/Swin-Transformer).
 Currently (13.04.2022), an official implementation of the Swin Transformer V2 is not publicly available.
 
+**Update**: The official Swin Transformer V2 implementation has been released [here](https://github.com/microsoft/Swin-Transformer)!
+
 ## Installation
 
 You can simply install the Swin Transformer V2 implementation as a Python package by using `pip`.
